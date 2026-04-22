@@ -169,58 +169,7 @@
         `;
     }).join('');
 }
-        //         function renderSkills(skills) {
-//     const container = document.getElementById('skill-container');
-//
-//     // 1. 定义状态颜色映射表 (Tailwind Class)
-//     const statusMap = {
-//         '觉醒': { text: 'text-amber-400', bg: 'bg-amber-500', border: 'border-amber-500/30' },
-//         '进化': { text: 'text-blue-400',  bg: 'bg-blue-500',  border: 'border-blue-500/30' },
-//         '衰退': { text: 'text-rose-500',  bg: 'bg-rose-600',  border: 'border-rose-500/30' }
-//     };
-//
-//     container.innerHTML = skills.map(s => {
-//         // 2. 获取当前状态对应的颜色，如果没有匹配则默认用 blue (进化)
-//         const theme = statusMap[s.status] || statusMap['进化'];
-//
-//         return `
-//             <div class="cyber-border p-4 rounded-2xl flex flex-col space-y-2 transition-all duration-500 ${theme.border}">
-//                 <div class="flex justify-between items-center">
-//                     <span class="font-bold text-sm ${theme.text} tracking-tight">${s.name}</span>
-//                     <span class="text-[9px] ${theme.bg}/10 ${theme.text} px-2 py-0.5 rounded uppercase font-bold border border-${theme.text}/20">
-//                         ${s.status}
-//                     </span>
-//                 </div>
-//                 <div class="flex items-center space-x-2">
-//                     <span class="text-[10px] text-zinc-500">Lv.${s.lv}</span>
-//                     <div class="flex-1 h-1 bg-white/5 rounded-full overflow-hidden">
-//                         <div class="h-full ${theme.bg} shadow-[0_0_8px_${theme.bg}]"
-//                              style="width: ${s.exp_percent}%">
-//                         </div>
-//                     </div>
-//                 </div>
-//             </div>
-//         `;
-//     }).join('');
-// }
 
-        // function renderSkills(skills) {
-        //     const container = document.getElementById('skill-list'); // 改正ID
-        //     document.getElementById('skill-container').innerHTML = skills.map(s => `
-        //         <div class="cyber-border p-4 rounded-2xl flex flex-col space-y-2">
-        //             <div class="flex justify-between items-center">
-        //                 <span class="font-bold text-sm text-blue-400 tracking-tight">${s.name}</span>
-        //                 <span class="text-[9px] bg-blue-500/10 text-blue-500 px-2 py-0.5 rounded uppercase font-bold">${s.status}</span>
-        //             </div>
-        //             <div class="flex items-center space-x-2">
-        //                 <span class="text-[10px] text-zinc-500">Lv.${s.lv}</span>
-        //                 <div class="flex-1 h-1 bg-white/5 rounded-full overflow-hidden">
-        //                     <div class="h-full bg-blue-500" style="width: ${s.exp_percent}%"></div>
-        //                 </div>
-        //             </div>
-        //         </div>
-        //     `).join('');
-        // }
 
         // 页面启动逻辑
         let radarChart = null;
