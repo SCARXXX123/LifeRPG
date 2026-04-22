@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>SOUL AUDIT REPORT</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;800&display=swap');
+        body { background: #020205; color: #fff; font-family: 'JetBrains Mono', monospace; min-height: 100vh; overflow-x: hidden; }
+        .cyber-border { border: 1px solid rgba(59, 130, 246, 0.3); background: rgba(10, 10, 15, 0.6); backdrop-filter: blur(10px); }
+        .stat-label { font-size: 10px; color: #666; text-transform: uppercase; letter-spacing: 2px; }
+        ::-webkit-scrollbar { width: 4px; }
+        ::-webkit-scrollbar-thumb { background: #1e3a8a; border-radius: 10px; }
+    </style>
+</head>
+<body class="p-8">
+    <div class="max-w-6xl mx-auto space-y-8 animate-in fade-in duration-1000">
+
+        <div class="flex justify-between items-end border-b border-blue-900/50 pb-4">
+            <div>
+                <p class="text-blue-500 text-xs tracking-[0.5em] mb-1" data-lang="soul_audit_report">SOUL_AUDIT_REPORT</p>
+                <h1 class="text-6xl font-black italic tracking-tighter text-white uppercase" data-lang="soul_evolution_report">灵魂演化报告</h1>
+            </div>
+            <div class="flex items-end gap-8">
+                <div class="text-right">
+                    <p class="text-zinc-500 text-xs uppercase" data-lang="report_date">Report_Date</p>
+                    <p id="record-date" class="text-xl font-black text-blue-600">2026-04-18</p>
+                </div>
+                <button id="lang-btn" class="px-4 py-2 border border-blue-500/30 text-blue-500 text-xs uppercase tracking-wider hover:border-blue-500 hover:bg-blue-500/10 transition-all">
+                    ENGLISH
+                </button>
+            </div>
+        </div>
+
+        <div class="cyber-border rounded-3xl p-8">
+            <div class="flex items-center justify-between mb-6">
+                <div class="text-xs text-zinc-500 uppercase tracking-widest" data-lang="doss_no">DOSS NO: SCAR-REF-2026</div>
+                <div class="text-xs bg-blue-500/20 text-blue-500 px-3 py-1 rounded-full uppercase font-bold" data-lang="status_final">STATUS: FINAL_VERDICT</div>
+            </div>
+
+            <div class="border-l-2 border-blue-500 pl-6 mb-8">
+                <div id="insight-text" class="text-xl font-bold text-white mb-4" data-lang="initializing">初始化中...</div>
+                <div id="tags-container" class="flex flex-wrap gap-2"></div>
+            </div>
+
+            <div class="mb-8">
+                <p class="stat-label mb-4 underline decoration-blue-500/50" data-lang="behavioral_analysis">Behavioral Analysis / 行为溯源</p>
+                <div id="report-content" class="text-zinc-300 leading-relaxed whitespace-pre-wrap" data-lang="deconstructing">
+                    正在解构当日数字生命脉冲...
+                </div>
+            </div>
+
+            <div>
+                <p class="stat-label mb-4 underline decoration-blue-500/50" data-lang="attribute_shifts">Attribute Shifts / 属性偏移</p>
+                <div id="stat-changes" class="cyber-border rounded-xl p-4">
+                </div>
+            </div>
+        </div>
+
+        <div class="flex justify-center pt-8 pb-12">
+            <button onclick="navToCharacter()" class="group relative px-20 py-5 bg-white text-black font-black text-xl rounded-full overflow-hidden hover:scale-105 transition-all">
+                <div class="absolute inset-0 bg-blue-600 -translate-x-full group-hover:translate-x-0 transition-transform duration-300"></div>
+                <span class="relative z-10 group-hover:text-white uppercase tracking-tighter" data-lang="accept_record">Accept & Record / 确认为演化结果</span>
+            </button>
+        </div>
+    </div>
+
+<script>
+    // 将初始化逻辑封装，方便多次调用或立即调用
+    async function loadAuditReport() {
+        console.log(">>> [前端] 开始请求报告数据...");
+        try {
+            // 确保 API 存在
+            if (!window.pywebview || !window.pywebview.api) {
+                console.error("API 未就绪");
+                return;
+            }
+
+            const data = await window.pywebview.api.get_latest_audit_report();
+            console.log(">>> [前端] 接收到数据:", data);
+
+            if (data) {
+                // 1. 日期与洞察
+                document.getElementById('record-date').innerText = data.date || "N/A";
+                document.getElementById('insight-text').innerText = data.insight || "无感悟";
+
+                // 2. 标签渲染
+                if (data.tags && Array.isArray(data.tags)) {
+                    document.getElementById('tags-container').innerHTML = data.tags
+                        .map(t => `<span class="text-xs bg-blue-500/20 text-blue-500 px-3 py-1 rounded-full uppercase font-bold">${t}</span>`).join('');
+                }
+
+                // 3. 正文：注意确认后端返回的是 summary 还是 full_report
+                document.getElementById('report-content').innerText = data.summary || "未找到报告正文";
+
+                // 4. 属性偏移
+                if (data.attribute_changes) {
+                    document.getElementById('stat-changes').innerHTML = `
+                        <div class="text-sm text-blue-400 font-mono">
+                            <span class="text-zinc-500 mr-4">>>></span>${data.attribute_changes}
+                        </div>
+                    `;
+                } else {
+                    document.getElementById('stat-changes').innerHTML = `
+                        <div class="text-sm text-zinc-500 font-mono">
+                            <span class="text-zinc-500 mr-4">>>></span>DATA_STABLE: 数值暂无显著演化
+                        </div>
+                    `;
+                }
+            } else {
+                document.getElementById('report-content').innerText = "数据库中未找到属于当前角色的最新报告。";
+            }
+        } catch (err) {
+            console.error("加载失败:", err);
+            document.getElementById('report-content').innerText = "链路读取失败: " + err;
+        }
+    }
+
+    // --- 核心修复：双重启动检查 ---
+    if (window.pywebview && window.pywebview.api) {
+        // 如果 API 已经由于缓存或先行注入存在，直接加载
+        loadAuditReport();
+    } else {
+        // 否则等待准备就绪事件
+        window.addEventListener('pywebviewready', loadAuditReport);
+    }
+
+    function navToCharacter() {
+        window.pywebview.api.navigate('character');
+    }
+
+    // Language switching
+    const langData = {
+        zh: {
+            soul_audit_report: 'SOUL_AUDIT_REPORT',
+            soul_evolution_report: '灵魂演化报告',
+            report_date: 'Report_Date',
+            doss_no: 'DOSS NO: SCAR-REF-2026',
+            status_final: 'STATUS: FINAL_VERDICT',
+            initializing: '初始化中...',
+            behavioral_analysis: 'Behavioral Analysis / 行为溯源',
+            deconstructing: '正在解构当日数字生命脉冲...',
+            attribute_shifts: 'Attribute Shifts / 属性偏移',
+            accept_record: 'Accept & Record / 确认为演化结果'
+        },
+        en: {
+            soul_audit_report: 'SOUL_AUDIT_REPORT',
+            soul_evolution_report: 'Soul Evolution Report',
+            report_date: 'Report_Date',
+            doss_no: 'DOSS NO: SCAR-REF-2026',
+            status_final: 'STATUS: FINAL_VERDICT',
+            initializing: 'Initializing...',
+            behavioral_analysis: 'Behavioral Analysis',
+            deconstructing: 'Deconstructing daily digital life pulse...',
+            attribute_shifts: 'Attribute Shifts',
+            accept_record: 'Accept & Record'
+        }
+    };
+
+    let currentLang = 'zh';
+
+    function changeLanguage() {
+        currentLang = currentLang === 'zh' ? 'en' : 'zh';
+        document.getElementById('lang-btn').textContent = currentLang === 'zh' ? 'ENGLISH' : '中文';
+        
+        document.querySelectorAll('[data-lang]').forEach(element => {
+            const key = element.getAttribute('data-lang');
+            if (langData[currentLang][key]) {
+                element.textContent = langData[currentLang][key];
+            }
+        });
+    }
+
+    document.getElementById('lang-btn').addEventListener('click', changeLanguage);
+</script>
+
+</body>
+</html>
+
+

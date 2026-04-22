@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MISSION_CONTROL | LifeRPG</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&display=swap');
+        body { background: #020205; color: #e4e4e7; font-family: 'JetBrains Mono', monospace; height: 100vh; overflow: hidden; display: flex; flex-direction: column; }
+        .cyber-card { background: rgba(15, 15, 20, 0.4); border: 1px solid rgba(255, 255, 255, 0.05); backdrop-filter: blur(10px); transition: all 0.3s; }
+        .cyber-card:hover { border-color: rgba(59, 130, 246, 0.2); background: rgba(15, 15, 20, 0.6); }
+        .nav-link { font-size: 10px; letter-spacing: 2px; color: #666; text-transform: uppercase; }
+        .nav-link:hover { color: #3b82f6; text-shadow: 0 0 10px #3b82f6; }
+
+        /* Switch Style */
+        .switch { position: relative; display: inline-block; width: 34px; height: 18px; }
+        .switch input { opacity: 0; width: 0; height: 0; }
+        .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #1a1a1a; transition: .4s; border-radius: 20px; border: 1px solid #333; }
+        .slider:before { position: absolute; content: ""; height: 12px; width: 12px; left: 2px; bottom: 2px; background-color: #555; transition: .4s; border-radius: 50%; }
+        input:checked + .slider { background-color: #3b82f633; border-color: #3b82f6; }
+        input:checked + .slider:before { transform: translateX(16px); background-color: #3b82f6; }
+    </style>
+</head>
+<body class="p-6">
+
+    <nav class="flex justify-between items-center border-b border-white/5 pb-4 mb-8 shrink-0">
+        <div>
+            <h1 class="text-xl font-black italic text-white uppercase tracking-tighter" data-lang="mission_control">Mission_Control</h1>
+            <p id="status-tag" class="text-[9px] text-zinc-600 uppercase mt-1 tracking-widest" data-lang="ready_for_audit">Ready for Behavioral Audit</p>
+        </div>
+        <div class="flex gap-8 items-center">
+            <a href="#" onclick="window.pywebview.api.navigate('dashboard')" class="nav-link">Dashboard</a>
+            <a href="#" onclick="window.pywebview.api.navigate('character')" class="nav-link">Character</a>
+            <a href="#" onclick="window.pywebview.api.navigate('settings')" class="nav-link">Settings</a>
+            <button id="lang-btn" class="px-4 py-2 border border-blue-500/30 text-blue-500 text-xs uppercase tracking-wider hover:border-blue-500 hover:bg-blue-500/10 transition-all">
+                ENGLISH
+            </button>
+        </div>
+    </nav>
+
+    <section class="flex gap-4 mb-8 shrink-0">
+        <div class="cyber-card px-6 py-4 rounded-2xl flex items-center gap-4 border-blue-500/20">
+            <span class="text-[10px] text-zinc-500 uppercase font-bold tracking-widest" data-lang="analysis_range">Analysis Range</span>
+            <select id="daysInput" class="bg-transparent text-blue-500 font-bold text-xs outline-none cursor-pointer">
+                <option value="1" data-lang="24_hours">24 HOURS</option>
+                <option value="3" data-lang="3_days">3 DAYS</option>
+                <option value="7" data-lang="7_days">7 DAYS</option>
+            </select>
+        </div>
+        <button id="scanBtn" onclick="runAudit()"
+                class="flex-1 bg-blue-600 hover:bg-blue-500 text-white rounded-2xl font-black text-xs uppercase tracking-[0.3em] transition-all shadow-lg shadow-blue-600/20 active:scale-95" data-lang="execute_audit">
+            Execute Neural Audit
+        </button>
+        <div class="cyber-card px-6 py-4 rounded-2xl flex items-center gap-4 border-blue-500/20">
+            <span class="text-[10px] text-zinc-500 uppercase font-bold tracking-widest" data-lang="neural_engine">Neural Engine</span>
+            <select id="modelSelect" class="bg-transparent text-blue-500 font-bold text-xs outline-none cursor-pointer">
+                <option value="deepseek-v3" data-lang="deepseek_v3">DEEPSEEK-V3 (Fast)</option>
+                <option value="qwen" data-lang="qwen">Qwen</option>
+<!--                <option value="gemini">Gemini-1.5-pro</option>-->
+            </select>
+        </div>
+    </section>
+
+    <main class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <!--        BILIBILI    -->
+        <div class="cyber-card p-6 rounded-[2rem] space-y-6">
+            <div class="flex justify-between items-start">
+                <div>
+                    <h3 class="text-sm font-black text-white uppercase tracking-widest" data-lang="bilibili">Bilibili</h3>
+                    <p class="text-[9px] text-zinc-500 uppercase mt-1" data-lang="video_consumption">Video Consumption Metrics</p>
+                </div>
+                <label class="switch"><input type="checkbox" id="enable-bili" checked><span class="slider"></span></label>
+            </div>
+            <div class="space-y-2">
+                <label class="text-[8px] text-blue-500/60 uppercase font-bold ml-1" data-lang="credentials_sessdata">Credentials (SESSDATA)</label>
+                <input id="sessInput" type="password" placeholder="••••••••••••••••"
+                       class="w-full bg-black/40 border border-white/5 rounded-xl px-4 py-3 text-xs text-blue-400 focus:outline-none focus:border-blue-500/40 transition-all">
+            </div>
+        </div>
+        <!--      AW_PC    -->
+        <div class="cyber-card p-6 rounded-[2rem] space-y-6">
+            <div class="flex justify-between items-start">
+                <div>
+                    <h3 class="text-sm font-black text-white uppercase tracking-widest" data-lang="activitywatch_pc">ActivityWatch_PC</h3>
+                    <p class="text-[9px] text-zinc-500 uppercase mt-1" data-lang="local_tracking">Local Application Tracking</p>
+                </div>
+                <label class="switch"><input type="checkbox" id="enable-aw" checked><span class="slider"></span></label>
+            </div>
+            <div class="h-[68px] flex items-center justify-center border border-dashed border-white/5 rounded-xl bg-white/[0.01]">
+                <span class="text-[9px] text-zinc-700 uppercase italic" data-lang="no_credentials">No Credentials Required</span>
+            </div>
+        </div>
+        <!--      AW_Android    -->
+        <div class="cyber-card p-6 rounded-[2rem] space-y-6">
+
+        <div class="flex justify-between items-start">
+        <div>
+            <h3 class="text-sm font-black text-white uppercase tracking-widest" data-lang="android">Android</h3>
+            <p class="text-[9px] text-zinc-500 uppercase mt-1" data-lang="mobile_timeline">Mobile Activity Timeline</p>
+        </div>
+        <label class="switch">
+            <input type="checkbox" id="enable-android" checked>
+            <span class="slider"></span>
+        </label>
+    </div>
+
+    <div class="space-y-4">
+        <div class="space-y-1">
+            <label class="text-[8px] text-emerald-500/60 uppercase font-bold ml-1" data-lang="adb_path">ADB Binary Path</label>
+            <input id="adbPathInput" type="text" placeholder="C:\platform-tools\adb.exe"
+                   class="w-full bg-black/40 border border-white/5 rounded-xl px-4 py-2 text-[10px] text-emerald-400 focus:outline-none focus:border-emerald-500/40 transition-all">
+        </div>
+
+        <div class="space-y-1">
+            <label class="text-[8px] text-emerald-500/60 uppercase font-bold ml-1" data-lang="device_id">Device ID / IP Address</label>
+            <input id="deviceIdInput" type="text" placeholder="xxx.xxx.x.xx:5555"
+                   class="w-full bg-black/40 border border-white/5 rounded-xl px-4 py-2 text-[10px] text-emerald-400 focus:outline-none focus:border-emerald-500/40 transition-all">
+        </div>
+    </div>
+</div>
+
+
+
+        <div class="cyber-card p-6 rounded-[2rem] border-dashed flex flex-col items-center justify-center opacity-30">
+            <div class="w-8 h-8 mb-2 border border-zinc-700 rounded-full flex items-center justify-center text-zinc-700">+</div>
+            <span class="text-[8px] uppercase tracking-widest text-zinc-600 font-bold" data-lang="add_data_source">Add New Data Source</span>
+        </div>
+
+    </main>
+
+<!--    <div id="overlay" class="fixed inset-0 bg-black/95 backdrop-blur-2xl hidden flex-col items-center justify-center z-50">-->
+<!--        <div class="space-y-6 text-center">-->
+<!--            <div class="w-10 h-10 border-2 border-blue-500 border-t-transparent rounded-full animate-spin mx-auto"></div>-->
+<!--            <div>-->
+<!--                <h2 class="text-lg font-bold italic tracking-tighter text-white uppercase">Neural Audit in Progress</h2>-->
+<!--                <p id="overlay-msg" class="text-[9px] text-blue-500/50 uppercase tracking-[0.4em] mt-2">Synchronizing Behavioral Data...</p>-->
+<!--            </div>-->
+<!--        </div>-->
+<!--    </div>-->
+    <div id="overlay" class="fixed top-0 left-0 w-screen h-screen bg-[#020205]/95 backdrop-blur-2xl hidden flex flex-col items-center justify-center z-[100]">
+    <div class="flex flex-col items-center justify-center space-y-8 animate-pulse">
+        <div class="w-12 h-12 border-2 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
+        <div class="text-center">
+            <h2 class="text-xl font-black italic tracking-tighter text-white uppercase" data-lang="audit_in_progress">Neural Audit in Progress</h2>
+            <div class="w-48 h-[1px] bg-blue-500/20 mx-auto mt-4 overflow-hidden relative">
+                <div class="absolute inset-0 bg-blue-500 w-1/2 animate-[scan_1.5s_infinite]"></div>
+            </div>
+            <p id="overlay-msg" class="text-[9px] text-blue-500/50 uppercase tracking-[0.4em] mt-6" data-lang="sync_data">Synchronizing Behavioral Data...</p>
+        </div>
+    </div>
+</div>
+
+    <script>
+        async function runAudit() {
+            const btn = document.getElementById('scanBtn');
+            const overlay = document.getElementById('overlay');
+
+            const config = {
+                use_bili: document.getElementById('enable-bili').checked,
+                use_aw: document.getElementById('enable-aw').checked,
+                sessdata: document.getElementById('sessInput').value,
+                days: parseInt(document.getElementById('daysInput').value),
+                use_android: document.getElementById('enable-android').checked,
+                android_adb_path: document.getElementById('adbPathInput').value,
+                android_device_id: document.getElementById('deviceIdInput').value,
+                model: document.getElementById('modelSelect').value
+            };
+
+            // 锁定 UI 并显示全屏加载
+            btn.disabled = true;
+            overlay.classList.remove('hidden');
+
+            try {
+                // 调用 Python 后端
+                const res = await window.pywebview.api.run_behavioral_audit(config);
+
+                if (res.success) {
+                    document.getElementById('overlay-msg').innerText = "Audit Complete. Generating Soul Report...";
+
+                    // 存储结果供 analyze_detail.html 使用
+                    localStorage.setItem('soul_insight', res.payload.insight);
+                    localStorage.setItem('soul_tags', JSON.stringify(res.payload.tags));
+                    localStorage.setItem('soul_full_report', res.payload.full_report);
+
+                    // 跳转
+                    setTimeout(() => {
+                        window.pywebview.api.navigate('analyze_detail');
+                    }, 1500);
+
+                } else {
+                    alert("Audit Failed: " + res.msg);
+                    overlay.classList.add('hidden');
+                    btn.disabled = false;
+                }
+            } catch (err) {
+                console.error(err);
+                overlay.classList.add('hidden');
+                btn.disabled = false;
+            }
+    }
+
+    // Language switching
+    const langData = {
+        zh: {
+            mission_control: 'Mission_Control',
+            ready_for_audit: '准备行为审计',
+            analysis_range: '分析范围',
+            '24_hours': '24小时',
+            '3_days': '3天',
+            '7_days': '7天',
+            execute_audit: '执行神经审计',
+            neural_engine: '神经引擎',
+            deepseek_v3: 'DEEPSEEK-V3 (快速)',
+            qwen: 'Qwen',
+            bilibili: '哔哩哔哩',
+            video_consumption: '视频消费指标',
+            credentials_sessdata: '凭证 (SESSDATA)',
+            activitywatch_pc: 'ActivityWatch_PC',
+            local_tracking: '本地应用追踪',
+            no_credentials: '无需凭证',
+            android: '安卓',
+            mobile_timeline: '移动活动时间线',
+            adb_path: 'ADB可执行文件路径',
+            device_id: '设备ID / IP地址',
+            add_data_source: '添加新数据源',
+            audit_in_progress: '神经审计进行中',
+            sync_data: '同步行为数据...',
+            audit_complete: '审计完成。生成灵魂报告...'
+        },
+        en: {
+            mission_control: 'Mission_Control',
+            ready_for_audit: 'Ready for Behavioral Audit',
+            analysis_range: 'Analysis Range',
+            '24_hours': '24 HOURS',
+            '3_days': '3 DAYS',
+            '7_days': '7 DAYS',
+            execute_audit: 'Execute Neural Audit',
+            neural_engine: 'Neural Engine',
+            deepseek_v3: 'DEEPSEEK-V3 (Fast)',
+            qwen: 'Qwen',
+            bilibili: 'Bilibili',
+            video_consumption: 'Video Consumption Metrics',
+            credentials_sessdata: 'Credentials (SESSDATA)',
+            activitywatch_pc: 'ActivityWatch_PC',
+            local_tracking: 'Local Application Tracking',
+            no_credentials: 'No Credentials Required',
+            android: 'Android',
+            mobile_timeline: 'Mobile Activity Timeline',
+            adb_path: 'ADB Binary Path',
+            device_id: 'Device ID / IP Address',
+            add_data_source: 'Add New Data Source',
+            audit_in_progress: 'Neural Audit in Progress',
+            sync_data: 'Synchronizing Behavioral Data...',
+            audit_complete: 'Audit Complete. Generating Soul Report...'
+        }
+    };
+
+    let currentLang = 'zh';
+
+    function changeLanguage() {
+        currentLang = currentLang === 'zh' ? 'en' : 'zh';
+        document.getElementById('lang-btn').textContent = currentLang === 'zh' ? 'ENGLISH' : '中文';
+        
+        document.querySelectorAll('[data-lang]').forEach(element => {
+            const key = element.getAttribute('data-lang');
+            if (langData[currentLang][key]) {
+                element.textContent = langData[currentLang][key];
+            }
+        });
+
+        // Update select options
+        document.querySelectorAll('select option').forEach(option => {
+            const key = option.getAttribute('data-lang');
+            if (key && langData[currentLang][key]) {
+                option.textContent = langData[currentLang][key];
+            }
+        });
+    }
+
+    document.getElementById('lang-btn').addEventListener('click', changeLanguage);
+    </script>
+</body>
+</html>

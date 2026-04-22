@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;800&display=swap');
+        body {
+            background: #020205; color: #fff; font-family: 'JetBrains Mono', monospace;
+            min-height: 100vh; overflow-x: hidden;
+        }
+        .cyber-border { border: 1px solid rgba(59, 130, 246, 0.3); background: rgba(10, 10, 15, 0.6); backdrop-filter: blur(10px); }
+        .stat-label { font-size: 10px; color: #666; text-transform: uppercase; letter-spacing: 2px; }
+        ::-webkit-scrollbar { width: 4px; }
+        ::-webkit-scrollbar-thumb { background: #1e3a8a; border-radius: 10px; }
+    </style>
+</head>
+<body class="p-8">
+    <div class="max-w-6xl mx-auto space-y-8 animate-in fade-in duration-1000">
+
+        <div class="flex justify-between items-end border-b border-blue-900/50 pb-4">
+            <div>
+                <p class="text-blue-500 text-xs tracking-[0.5em] mb-1">SUBJECT_PROFILE_ID: <span id="hero-name">---</span></p>
+                <h1 id="hero-title" class="text-6xl font-black italic tracking-tighter text-white uppercase">---</h1>
+            </div>
+            <div class="flex items-end gap-8">
+                <div class="text-right">
+                    <p class="text-zinc-500 text-[10px] uppercase" data-lang="evaluation_level">Evaluation_Level</p>
+                    <p id="hero-level" class="text-5xl font-black text-blue-600">01</p>
+                </div>
+                <button id="lang-btn" class="px-4 py-2 border border-blue-500/30 text-blue-500 text-xs uppercase tracking-wider hover:border-blue-500 hover:bg-blue-500/10 transition-all">
+                    ENGLISH
+                </button>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-12 gap-8 h-[400px]">
+            <div class="col-span-12 md:col-span-5 cyber-border rounded-3xl p-6 relative flex items-center justify-center">
+                <div class="absolute top-4 left-6 text-[10px] text-blue-500 font-bold tracking-widest uppercase" data-lang="radar_stats">Radar_Stats_Analysis</div>
+                <canvas id="radarChart"></canvas>
+            </div>
+
+            <div class="col-span-12 md:col-span-7 space-y-4">
+                <div class="cyber-border rounded-3xl p-8 h-full flex flex-col justify-center">
+                    <div class="mb-6">
+                        <p class="stat-label mb-2 underline decoration-blue-500/50" data-lang="audit_report">Brief_Audit_Report</p>
+                        <p id="status-summary" class="text-zinc-300 leading-relaxed italic text-lg">---</p>
+                    </div>
+                    <div class="pt-6 border-t border-white/5">
+                        <p class="stat-label mb-2" data-lang="system_commentary">System_Commentary</p>
+                        <p id="system-comment" class="text-blue-400 font-bold tracking-tight text-xl">"---"</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="space-y-4">
+            <div class="flex items-center space-x-4">
+                <span class="text-[10px] font-bold text-zinc-500 uppercase tracking-widest" data-lang="awakened_skills">Awakened_Skills</span>
+                <div class="h-[1px] flex-1 bg-white/5"></div>
+            </div>
+            <div id="skill-container" class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                </div>
+        </div>
+
+        <div class="flex justify-center pt-8 pb-12">
+            <button onclick="window.pywebview.api.go_to_dashboard()"
+                    class="group relative px-20 py-5 bg-white text-black font-black text-xl rounded-full overflow-hidden hover:scale-105 transition-all">
+                <div class="absolute inset-0 bg-blue-600 -translate-x-full group-hover:translate-x-0 transition-transform duration-300"></div>
+                <span class="relative z-10 group-hover:text-white uppercase tracking-tighter" data-lang="enter_dashboard">接入控制中枢 (ENTER_DASHBOARD)</span>
+            </button>
+        </div>
+    </div>
+
+    <script>
+        // 修改后的初始化雷达图函数
+        function initRadar(stats) {
+            const ctx = document.getElementById('radarChart').getContext('2d');
+            new Chart(ctx, {
+                type: 'radar',
+                data: {
+                    labels: ['智力', '魅力', '精力', '力量', '韧性', '财力'],
+                    datasets: [{
+                        data: [
+                            stats.intellect,
+                            stats.charm,
+                            stats.energy,
+                            stats.strength,
+                            stats.resilience,
+                            stats.wealth
+                        ],
+                        backgroundColor: 'rgba(59, 130, 246, 0.2)', // 填充色
+                        borderColor: '#3b82f6',                // 线条色
+                        borderWidth: 2,
+                        pointBackgroundColor: '#fff',
+                        pointRadius: 3,
+                        pointHoverRadius: 5
+                    }]
+                },
+                options: {
+                    scales: {
+                        r: {
+                            min: 0,
+                            max: 150, // 👈 关键修改：上限调至 100
+                            ticks: {
+                                display: false,
+                                stepSize: 20 // 每一圈代表 20
+                            },
+                            grid: {
+                                color: 'rgba(255, 255, 255, 0.1)', // 网格线颜色稍微亮一点
+                                circular: false // 设置为 false 保持六边形外形
+                            },
+                            angleLines: { color: 'rgba(255, 255, 255, 0.1)' },
+                            pointLabels: {
+                                color: '#aaa',
+                                font: {
+                                    size: 12,
+                                    family: 'JetBrains Mono',
+                                    weight: 'bold'
+                                }
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: { enabled: true } // 开启悬浮查看具体数值
+                    }
+                }
+            });
+        }
+
+        // 渲染技能卡片
+
+        function renderSkills(skills) {
+    const container = document.getElementById('skill-container');
+
+    // --- 1. 定位并修改颜色映射表 ---
+    const statusMap = {
+        '觉醒': { text: 'text-amber-400', bg: 'bg-amber-500', border: 'border-amber-500/30' },
+        '进化': { text: 'text-blue-400',  bg: 'bg-blue-500',  border: 'border-blue-500/30' },
+        '维持': { text: 'text-zinc-400',  bg: 'bg-zinc-500',  border: 'border-zinc-500/20' }, // 👈 新增：维持状态用灰色
+        '衰退': { text: 'text-rose-500',  bg: 'bg-rose-600',  border: 'border-rose-500/30' }
+    };
+
+    container.innerHTML = skills.map(s => {
+        // 这里的 theme 变量会根据 s.status 自动切换颜色包
+        const theme = statusMap[s.status] || statusMap['维持'];
+
+        // --- 2. 这里就是 HTML 模板变量的修改位置 ---
+        return `
+            <div class="cyber-border p-4 rounded-2xl flex flex-col space-y-2 transition-all duration-500 ${theme.border}">
+                <div class="flex justify-between items-center">
+                    <span class="font-bold text-sm ${theme.text} tracking-tight">${s.name}</span>
+
+                    <span class="text-[9px] ${theme.bg}/10 ${theme.text} px-2 py-0.5 rounded uppercase font-bold border border-${theme.text}/20">
+                        ${s.status}
+                    </span>
+                </div>
+                <div class="flex items-center space-x-2">
+                    <span class="text-[10px] text-zinc-500">Lv.${s.lv}</span>
+                    <div class="flex-1 h-1 bg-white/5 rounded-full overflow-hidden">
+                        <div class="h-full ${theme.bg} transition-all duration-1000"
+                             style="width: ${s.exp_percent}%">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+    }).join('');
+}
+        //         function renderSkills(skills) {
+//     const container = document.getElementById('skill-container');
+//
+//     // 1. 定义状态颜色映射表 (Tailwind Class)
+//     const statusMap = {
+//         '觉醒': { text: 'text-amber-400', bg: 'bg-amber-500', border: 'border-amber-500/30' },
+//         '进化': { text: 'text-blue-400',  bg: 'bg-blue-500',  border: 'border-blue-500/30' },
+//         '衰退': { text: 'text-rose-500',  bg: 'bg-rose-600',  border: 'border-rose-500/30' }
+//     };
+//
+//     container.innerHTML = skills.map(s => {
+//         // 2. 获取当前状态对应的颜色，如果没有匹配则默认用 blue (进化)
+//         const theme = statusMap[s.status] || statusMap['进化'];
+//
+//         return `
+//             <div class="cyber-border p-4 rounded-2xl flex flex-col space-y-2 transition-all duration-500 ${theme.border}">
+//                 <div class="flex justify-between items-center">
+//                     <span class="font-bold text-sm ${theme.text} tracking-tight">${s.name}</span>
+//                     <span class="text-[9px] ${theme.bg}/10 ${theme.text} px-2 py-0.5 rounded uppercase font-bold border border-${theme.text}/20">
+//                         ${s.status}
+//                     </span>
+//                 </div>
+//                 <div class="flex items-center space-x-2">
+//                     <span class="text-[10px] text-zinc-500">Lv.${s.lv}</span>
+//                     <div class="flex-1 h-1 bg-white/5 rounded-full overflow-hidden">
+//                         <div class="h-full ${theme.bg} shadow-[0_0_8px_${theme.bg}]"
+//                              style="width: ${s.exp_percent}%">
+//                         </div>
+//                     </div>
+//                 </div>
+//             </div>
+//         `;
+//     }).join('');
+// }
+
+        // function renderSkills(skills) {
+        //     const container = document.getElementById('skill-list'); // 改正ID
+        //     document.getElementById('skill-container').innerHTML = skills.map(s => `
+        //         <div class="cyber-border p-4 rounded-2xl flex flex-col space-y-2">
+        //             <div class="flex justify-between items-center">
+        //                 <span class="font-bold text-sm text-blue-400 tracking-tight">${s.name}</span>
+        //                 <span class="text-[9px] bg-blue-500/10 text-blue-500 px-2 py-0.5 rounded uppercase font-bold">${s.status}</span>
+        //             </div>
+        //             <div class="flex items-center space-x-2">
+        //                 <span class="text-[10px] text-zinc-500">Lv.${s.lv}</span>
+        //                 <div class="flex-1 h-1 bg-white/5 rounded-full overflow-hidden">
+        //                     <div class="h-full bg-blue-500" style="width: ${s.exp_percent}%"></div>
+        //                 </div>
+        //             </div>
+        //         </div>
+        //     `).join('');
+        // }
+
+        // 页面启动逻辑
+        let radarChart = null;
+        let currentStats = null;
+
+        window.addEventListener('pywebviewready', async () => {
+            const data = await window.pywebview.api.get_character_init_data();
+            if (data) {
+                document.getElementById('hero-name').innerText = data.name;
+                document.getElementById('hero-title').innerText = data.title;
+                document.getElementById('hero-level').innerText = data.level.toString().padStart(2, '0');
+                document.getElementById('status-summary').innerText = data.status_summary;
+                document.getElementById('system-comment').innerText = `"${data.system_comment}"`;
+
+                currentStats = data.stats;
+                initRadar(data.stats);
+                renderSkills(data.skills);
+            }
+        });
+
+        // Language switching
+        const langData = {
+            zh: {
+                evaluation_level: 'Evaluation_Level',
+                radar_stats: 'Radar_Stats_Analysis',
+                audit_report: 'Brief_Audit_Report',
+                system_commentary: 'System_Commentary',
+                awakened_skills: 'Awakened_Skills',
+                enter_dashboard: '接入控制中枢 (ENTER_DASHBOARD)',
+                stats_labels: ['智力', '魅力', '精力', '力量', '韧性', '财力']
+            },
+            en: {
+                evaluation_level: 'Evaluation_Level',
+                radar_stats: 'Radar_Stats_Analysis',
+                audit_report: 'Brief_Audit_Report',
+                system_commentary: 'System_Commentary',
+                awakened_skills: 'Awakened_Skills',
+                enter_dashboard: 'Access Control Center (ENTER_DASHBOARD)',
+                stats_labels: ['Intellect', 'Charm', 'Energy', 'Strength', 'Resilience', 'Wealth']
+            }
+        };
+
+        let currentLang = 'zh';
+
+        function changeLanguage() {
+            currentLang = currentLang === 'zh' ? 'en' : 'zh';
+            document.getElementById('lang-btn').textContent = currentLang === 'zh' ? 'ENGLISH' : '中文';
+            
+            document.querySelectorAll('[data-lang]').forEach(element => {
+                const key = element.getAttribute('data-lang');
+                if (langData[currentLang][key]) {
+                    element.textContent = langData[currentLang][key];
+                }
+            });
+
+            // Update radar chart labels
+            if (radarChart) {
+                radarChart.data.labels = langData[currentLang].stats_labels;
+                radarChart.update();
+            }
+        }
+
+        document.getElementById('lang-btn').addEventListener('click', changeLanguage);
+
+        // 修改后的初始化雷达图函数
+        function initRadar(stats) {
+            const ctx = document.getElementById('radarChart').getContext('2d');
+            
+            // Destroy existing chart if it exists
+            if (radarChart) {
+                radarChart.destroy();
+            }
+            
+            radarChart = new Chart(ctx, {
+                type: 'radar',
+                data: {
+                    labels: langData[currentLang].stats_labels,
+                    datasets: [{
+                        data: [
+                            stats.intellect,
+                            stats.charm,
+                            stats.energy,
+                            stats.strength,
+                            stats.resilience,
+                            stats.wealth
+                        ],
+                        backgroundColor: 'rgba(59, 130, 246, 0.2)', // 填充色
+                        borderColor: '#3b82f6',                // 线条色
+                        borderWidth: 2,
+                        pointBackgroundColor: '#fff',
+                        pointRadius: 3,
+                        pointHoverRadius: 5
+                    }]
+                },
+                options: {
+                    scales: {
+                        r: {
+                            min: 0,
+                            max: 150, // 👈 关键修改：上限调至 100
+                            ticks: {
+                                display: false,
+                                stepSize: 20 // 每一圈代表 20
+                            },
+                            grid: {
+                                color: 'rgba(255, 255, 255, 0.1)', // 网格线颜色稍微亮一点
+                                circular: false // 设置为 false 保持六边形外形
+                            },
+                            angleLines: { color: 'rgba(255, 255, 255, 0.1)' },
+                            pointLabels: {
+                                color: '#aaa',
+                                font: {
+                                    size: 12,
+                                    family: 'JetBrains Mono',
+                                    weight: 'bold'
+                                }
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: { enabled: true } // 开启悬浮查看具体数值
+                    }
+                }
+            });
+        }
+    </script>
+</body>
+</html>

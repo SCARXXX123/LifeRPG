@@ -1,0 +1,135 @@
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>LifeRPG - 身份验证</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;800&display=swap');
+        body { background: #020205; color: #fff; font-family: 'JetBrains Mono', monospace; min-height: 100vh; overflow-x: hidden; }
+        .cyber-border { border: 1px solid rgba(59, 130, 246, 0.3); background: rgba(10, 10, 15, 0.6); backdrop-filter: blur(10px); }
+        .stat-label { font-size: 10px; color: #666; text-transform: uppercase; letter-spacing: 2px; }
+        ::-webkit-scrollbar { width: 4px; }
+        ::-webkit-scrollbar-thumb { background: #1e3a8a; border-radius: 10px; }
+    </style>
+</head>
+<body class="p-8 flex flex-col items-center justify-center min-h-screen">
+
+    <div class="absolute top-8 right-8">
+        <button id="lang-btn" class="px-4 py-2 border border-blue-500/30 text-blue-500 text-xs uppercase tracking-wider hover:border-blue-500 hover:bg-blue-500/10 transition-all">
+            ENGLISH
+        </button>
+    </div>
+
+    <button onclick="pywebview.api.navigate('index')" class="absolute top-8 left-8 px-4 py-2 border border-blue-500/30 text-blue-500 text-xs uppercase tracking-wider hover:border-blue-500 hover:bg-blue-500/10 transition-all">
+        [ ESC_BACK_TO_ENTRY ]
+    </button>
+
+    <div class="text-center mb-12">
+        <h1 class="text-5xl font-black italic tracking-tighter text-white uppercase mb-2">IDENTITY_AUTH</h1>
+        <p class="text-zinc-500 text-xs uppercase tracking-widest" data-lang="biometric">请输入生物特征识别密钥</p>
+    </div>
+
+    <div class="cyber-border rounded-3xl p-8 w-full max-w-md">
+        <div class="space-y-6">
+            <div>
+                <label class="stat-label block mb-2">Subject_Name</label>
+                <input type="text" id="username" placeholder="请输入代号..." autocomplete="off" class="w-full bg-black/40 border border-white/5 rounded-xl px-4 py-3 text-xs text-blue-400 focus:outline-none focus:border-blue-500/40 transition-all" data-placeholder="username_placeholder">
+            </div>
+
+            <div>
+                <label class="stat-label block mb-2">Access_Password</label>
+                <input type="password" id="password" placeholder="请输入通行密码..." autocomplete="off" class="w-full bg-black/40 border border-white/5 rounded-xl px-4 py-3 text-xs text-blue-400 focus:outline-none focus:border-blue-500/40 transition-all" data-placeholder="password_placeholder">
+            </div>
+
+            <button onclick="attemptLogin()" class="w-full bg-transparent border border-blue-500 text-blue-500 py-3 rounded-xl font-bold text-sm uppercase tracking-wider hover:bg-blue-500 hover:text-black transition-all" data-lang="access">
+                接入系统 (ACCESS)
+            </button>
+
+            <div id="error-box" class="text-red-500 text-xs text-center min-h-[20px]" data-lang="error"></div>
+        </div>
+    </div>
+
+    <div class="absolute bottom-8 text-xs text-zinc-700 uppercase tracking-wider">
+        SECURE TERMINAL GATEWAY - LEVEL 4 ACCESS REQUIRED
+    </div>
+
+    <script>
+        const langData = {
+            zh: {
+                biometric: '请输入生物特征识别密钥',
+                username_placeholder: '请输入代号...',
+                password_placeholder: '请输入通行密码...',
+                access: '接入系统 (ACCESS)',
+                error_empty: '>> 警告: 身份凭据不完整',
+                error_checking: '>> 正在校验密钥...',
+                error_success: '>> 验证通过，欢迎回来 '
+            },
+            en: {
+                biometric: 'Please enter biometric identification key',
+                username_placeholder: 'Please enter code name...',
+                password_placeholder: 'Please enter access password...',
+                access: 'Access System (ACCESS)',
+                error_empty: '>> Warning: Identity credentials incomplete',
+                error_checking: '>> Checking key...',
+                error_success: '>> Verification passed, welcome back '
+            }
+        };
+
+        let currentLang = 'zh';
+
+        function changeLanguage() {
+            currentLang = currentLang === 'zh' ? 'en' : 'zh';
+            document.getElementById('lang-btn').textContent = currentLang === 'zh' ? 'ENGLISH' : '中文';
+            
+            document.querySelectorAll('[data-lang]').forEach(element => {
+                const key = element.getAttribute('data-lang');
+                if (langData[currentLang][key]) {
+                    element.textContent = langData[currentLang][key];
+                }
+            });
+
+            document.querySelectorAll('[data-placeholder]').forEach(element => {
+                const key = element.getAttribute('data-placeholder');
+                if (langData[currentLang][key]) {
+                    element.placeholder = langData[currentLang][key];
+                }
+            });
+        }
+
+        document.getElementById('lang-btn').addEventListener('click', changeLanguage);
+
+        function attemptLogin() {
+            const name = document.getElementById('username').value;
+            const pass = document.getElementById('password').value;
+            const errorBox = document.getElementById('error-box');
+
+            if (!name || !pass) {
+                errorBox.innerText = langData[currentLang].error_empty;
+                return;
+            }
+
+            errorBox.innerText = langData[currentLang].error_checking;
+
+            pywebview.api.login_confirm(name, pass).then(function(response) {
+                if (response.success) {
+                    errorBox.style.color = "#3b82f6";
+                    errorBox.innerText = langData[currentLang].error_success + name;
+                    setTimeout(() => {
+                        pywebview.api.navigate('dashboard');
+                    }, 1000);
+                } else {
+                    errorBox.style.color = "#ef4444";
+                    errorBox.innerText = ">> Error: " + response.message;
+                }
+            });
+        }
+
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter') attemptLogin();
+        });
+    </script>
+</body>
+</html>
+

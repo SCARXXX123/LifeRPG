@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>SYSTEM SETTINGS</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;800&display=swap');
+        body { background: #020205; color: #fff; font-family: 'JetBrains Mono', monospace; min-height: 100vh; overflow-x: hidden; }
+        .cyber-border { border: 1px solid rgba(59, 130, 246, 0.3); background: rgba(10, 10, 15, 0.6); backdrop-filter: blur(10px); }
+        .stat-label { font-size: 10px; color: #666; text-transform: uppercase; letter-spacing: 2px; }
+        ::-webkit-scrollbar { width: 4px; }
+        ::-webkit-scrollbar-thumb { background: #1e3a8a; border-radius: 10px; }
+    </style>
+</head>
+<body class="p-8">
+    <div class="max-w-6xl mx-auto space-y-8 animate-in fade-in duration-1000">
+
+        <div class="flex justify-between items-end border-b border-blue-900/50 pb-4">
+            <div>
+                <p class="text-blue-500 text-xs tracking-[0.5em] mb-1" data-lang="system_config">SYSTEM_CONFIG</p>
+                <h1 class="text-6xl font-black italic tracking-tighter text-white uppercase" data-lang="system_settings">系统设置</h1>
+            </div>
+            <div class="flex items-end gap-4">
+                <button id="lang-btn" class="px-4 py-2 border border-blue-500/30 text-blue-500 text-xs uppercase tracking-wider hover:border-blue-500 hover:bg-blue-500/10 transition-all">
+                    ENGLISH
+                </button>
+                <button onclick="window.pywebview.api.navigate('dashboard')" class="group relative px-8 py-3 bg-white text-black font-black text-sm rounded-full overflow-hidden hover:scale-105 transition-all">
+                    <div class="absolute inset-0 bg-blue-600 -translate-x-full group-hover:translate-x-0 transition-transform duration-300"></div>
+                    <span class="relative z-10 group-hover:text-white uppercase tracking-tighter" data-lang="back_to_dashboard">返回控制台</span>
+                </button>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <div class="cyber-border rounded-3xl p-8">
+                <div class="mb-6">
+                    <p class="stat-label mb-4 underline decoration-blue-500/50" data-lang="new_access_key">New Access Key / 重置密钥</p>
+                    <input type="password" id="new-pass" placeholder="输入新密码..." data-placeholder="new_password_placeholder" class="w-full bg-black/40 border border-white/5 rounded-xl px-4 py-3 text-xs text-blue-400 focus:outline-none focus:border-blue-500/40 transition-all">
+                    <button onclick="updatePass()" class="mt-4 w-full bg-transparent border border-blue-500 text-blue-500 py-3 rounded-xl font-bold text-sm uppercase tracking-wider hover:bg-blue-500 hover:text-black transition-all" data-lang="update_key">Update Key</button>
+                </div>
+            </div>
+
+            <div class="cyber-border rounded-3xl p-8">
+                <div class="mb-6">
+                    <p class="stat-label mb-4 underline decoration-red-500/50" data-lang="account_termination">Account Termination / 抹除序列</p>
+                    <p class="text-zinc-500 text-xs mb-4" data-lang="warning_message">警告：此操作将永久抹除所有行为记录与进化状态。</p>
+                    <button onclick="deleteAcc()" class="mt-4 w-full bg-transparent border border-red-500 text-red-500 py-3 rounded-xl font-bold text-sm uppercase tracking-wider hover:bg-red-500 hover:text-white transition-all" data-lang="format_data">Format Soul Data</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+<script>
+    async function updatePass() {
+        const pass = document.getElementById('new-pass').value;
+        if (!pass) return alert("密码不能为空");
+
+        const res = await window.pywebview.api.update_password(pass);
+        if (res.success) {
+            alert("密钥更新成功。");
+            document.getElementById('new-pass').value = '';
+        }
+    }
+
+    async function deleteAcc() {
+        if (confirm(currentLang === 'zh' ? "确定要格式化所有灵魂数据吗？此过程不可逆。" : "Are you sure you want to format all soul data? This process is irreversible.")) {
+            const res = await window.pywebview.api.delete_account();
+            if (res.success) {
+                alert(currentLang === 'zh' ? "档案已抹除，系统重启。" : "Profile has been erased, system restarting.");
+            }
+        }
+    }
+
+    // Language switching
+    const langData = {
+        zh: {
+            system_config: 'SYSTEM_CONFIG',
+            system_settings: '系统设置',
+            back_to_dashboard: '返回控制台',
+            new_access_key: 'New Access Key / 重置密钥',
+            new_password_placeholder: '输入新密码...',
+            update_key: 'Update Key',
+            account_termination: 'Account Termination / 抹除序列',
+            warning_message: '警告：此操作将永久抹除所有行为记录与进化状态。',
+            format_data: 'Format Soul Data'
+        },
+        en: {
+            system_config: 'SYSTEM_CONFIG',
+            system_settings: 'System Settings',
+            back_to_dashboard: 'Back to Dashboard',
+            new_access_key: 'New Access Key',
+            new_password_placeholder: 'Enter new password...',
+            update_key: 'Update Key',
+            account_termination: 'Account Termination',
+            warning_message: 'Warning: This operation will permanently erase all behavior records and evolution status.',
+            format_data: 'Format Soul Data'
+        }
+    };
+
+    let currentLang = 'zh';
+
+    function changeLanguage() {
+        currentLang = currentLang === 'zh' ? 'en' : 'zh';
+        document.getElementById('lang-btn').textContent = currentLang === 'zh' ? 'ENGLISH' : '中文';
+        
+        document.querySelectorAll('[data-lang]').forEach(element => {
+            const key = element.getAttribute('data-lang');
+            if (langData[currentLang][key]) {
+                element.textContent = langData[currentLang][key];
+            }
+        });
+
+        // Update placeholders
+        document.querySelectorAll('[data-placeholder]').forEach(element => {
+            const key = element.getAttribute('data-placeholder');
+            if (langData[currentLang][key]) {
+                element.placeholder = langData[currentLang][key];
+            }
+        });
+    }
+
+    document.getElementById('lang-btn').addEventListener('click', changeLanguage);
+</script>
+
+</body>
+</html>
