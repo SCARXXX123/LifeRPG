@@ -87,10 +87,10 @@ LifeRPG is an innovative personal behavior analysis and digital avatar system th
 ![数字化身](character_pic.png)
 
 ### 行为审计 | Behavioral Audit
-![行为审计](audit_pic.png)
+![行为审计](audit_pic_JP.png)
 
 ### 审计报告 | Audit Report
-![审计报告](report_pic.png)
+![审计报告](report_pic_JP.png)
 
 ### 审计后的数字化身 | Digital Avatar After Audit
 ![审计后的数字化身](character_after_audit_pic.png)
