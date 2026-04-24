@@ -72,6 +72,29 @@ LifeRPG is an innovative personal behavior analysis and digital avatar system th
    python main.py
    ```
 
+## 应用截图 | Application Screenshots
+
+### 主界面 | Main Interface
+![主界面](index_pic.png)
+
+### 初始化页面 | Initialization Page
+![初始化页面](initialize_pic.png)
+
+### 控制中枢 | Control Center
+![控制中枢](dashboard_pic.png)
+
+### 数字化身 | Digital Avatar
+![数字化身](character_pic.png)
+
+### 行为审计 | Behavioral Audit
+![行为审计](audit_pic.png)
+
+### 审计报告 | Audit Report
+![审计报告](report_pic.png)
+
+### 审计后的数字化身 | Digital Avatar After Audit
+![审计后的数字化身](character_after_audit_pic.png)
+
 ## 使用指南 | User Guide
 
 ### 1. 创建数字化身 | Create Digital Avatar
