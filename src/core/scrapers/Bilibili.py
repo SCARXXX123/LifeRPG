@@ -3,7 +3,8 @@ import time
 import datetime as dt_module
 import pytz
 import urllib3
-
+from requests.adapters import HTTPAdapter
+from urllib3.util.retry import Retry
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
 class BiliScraper:
@@ -16,6 +17,9 @@ class BiliScraper:
             "Referer": "https://www.bilibili.com/"
         }
         self.device_map = {1: "Pad", 2: "PC", 3: "手机", 4: "TV", 5: "APP", 7: "H5"}
+        self.session = requests.Session()
+        retries = Retry(total=3, backoff_factor=1, status_forcelist=[500, 502, 503, 504])
+        self.session.mount('https://', HTTPAdapter(max_retries=retries))
 
     def get_history(self, days=1):
         all_data = []
@@ -28,10 +32,10 @@ class BiliScraper:
         try:
             while not stop_scan:
                 params = {"view_at": last_view_at} if last_view_at > 0 else {}
-                resp = requests.get(self.url,
+                resp = self.session.get(self.url,
                                     headers=self.headers,
                                     params=params,
-                                    timeout=10,
+                                    timeout=15,
                                     verify=False)
                 res_json = resp.json()
 
