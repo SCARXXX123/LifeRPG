@@ -85,7 +85,7 @@ ActivityWatch 是一款开源的时间追踪工具，用于记录您在 PC 上�
 
 在开发者选项中，找到并启用「无线调试」功能。
 
-![手机无线调试页面示意](E:\pythonProject\LifeRPG-Desktop_test\tutorial\Screenshot_2026-04-29-19-19-19-894_com.android.se.jpg)
+![手机无线调试页面示意](tutorial/Screenshot_2026-04-29-19-19-19-894_com.android.se.jpg)
 
 ![无线调试详情页面](E:\pythonProject\LifeRPG-Desktop_test\tutorial\Screenshot_2026-04-29-19-22-24-549_com.android.se.jpg)
 
