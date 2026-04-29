@@ -387,6 +387,7 @@ class LifeRPGApi:
             return {"success": False, "msg": str(e)}
 
 
+
     def _apply_evolution(self, hero, up, audit_report):
         """
         up: AI 返回的更新后的 profile (updated_profile)
