@@ -5,7 +5,7 @@
 LifeRPG 是一个创新的个人行为分析与数字化身系统，它将现实生活中的行为数据转化为游戏化的角色属性，通过 AI 分析帮助用户了解自己的行为模式并促进个人成长。
 
 LifeRPG is an innovative personal behavior analysis and digital avatar system that transforms real-life behavior data into game-like character attributes, helping users understand their behavior patterns and promote personal growth through AI analysis.
-![简介图片](pictures/intro_pic.png)
+![简介图片](pictures/Intro_pic.png)
 
 ### 核心功能 | Core Features
 
