@@ -141,7 +141,7 @@ adb connect IP地址:端口
 
 确认信息无误后，系统将开始抓取手机的每日使用数据。
 
-![配置完成示意](E:\pythonProject\LifeRPG-Desktop_test\tutorial\audit_pic.png)
+![配置完成示意](./audit_pic.png)
 
 ### 注意事项
 
