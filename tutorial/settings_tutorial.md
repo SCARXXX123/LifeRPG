@@ -85,9 +85,9 @@ ActivityWatch 是一款开源的时间追踪工具，用于记录您在 PC 上�
 
 在开发者选项中，找到并启用「无线调试」功能。
 
-![手机无线调试页面示意](tutorial/Screenshot_2026-04-29-19-19-19-894_com.android.se.jpg)
+![手机无线调试页面示意](./Screenshot_2026-04-29-19-19-19-894_com.android.se.jpg)
 
-![无线调试详情页面](E:\pythonProject\LifeRPG-Desktop_test\tutorial\Screenshot_2026-04-29-19-22-24-549_com.android.se.jpg)
+![无线调试详情页面](./Screenshot_2026-04-29-19-22-24-549_com.android.se.jpg)
 
 ### 电脑端配置
 
@@ -105,7 +105,7 @@ ActivityWatch 是一款开源的时间追踪工具，用于记录您在 PC 上�
    cd E:\adb\platform-tools
    ```
 
-![命令提示符操作示意](E:\pythonProject\LifeRPG-Desktop_test\tutorial\QQ20260429-193450.png)
+![命令提示符操作示意](./QQ20260429-193450.png)
 
 ### 配对设备
 
@@ -121,7 +121,7 @@ ActivityWatch 是一款开源的时间追踪工具，用于记录您在 PC 上�
    ```
 4. 输入配对码完成配对过程。
 
-![配对命令执行示意](E:\pythonProject\LifeRPG-Desktop_test\tutorial\QQ20260429-193744.png)
+![配对命令执行示意](./QQ20260429-193744.png)
 
 ### 连接设备
 
@@ -130,7 +130,7 @@ ActivityWatch 是一款开源的时间追踪工具，用于记录您在 PC 上�
 adb connect IP地址:端口
 ```
 
-![连接命令执行示意](E:\pythonProject\LifeRPG-Desktop_test\tutorial\QQ20260429-194424.png)
+![连接命令执行示意](./QQ20260429-194424.png)
 
 ### 完成配置
 
